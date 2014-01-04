@@ -1,7 +1,8 @@
 #include "num2words.h"
 #include "string.h"
 
-static const char* const HOURS[] = {
+static const char * const HEURES[] =
+{
 	"minuit",
 	"une",
 	"deux",
@@ -17,30 +18,116 @@ static const char* const HOURS[] = {
 	"midi"
 };
 
-static const char * STR_HEURES = "heures";
-static const char * STR_HEURE = "heure";
+static const char * const JOURS[] =
+{
+	"Dimanche",
+	"Lundi",
+	"Mardi",
+	"Mercredi",
+	"Jeudi",
+	"Vendredi",
+	"Samedi"
+};
 
-static const char * STR_0 = "pile";
-static const char * STR_1 = "juste passé";
-static const char * STR_5 = "cinq";
-static const char * STR_10 = "dix";
-static const char * STR_15 = "et quart";
-static const char * STR_20 = "vingt";
-static const char * STR_30 = "et demi";
-static const char * STR_40 = "moins vingt";
-static const char * STR_45 = "moins le quart";
-static const char * STR_50 = "moins dix";
-static const char * STR_55 = "moins cinq";
-static const char * STR_59 = "moins cinq";
+static const char * const MOIS[] =
+{
+	"janvier",
+	"février",
+	"mars",
+	"avril",
+	"mai",
+	"juin",
+	"juillet",
+	"août",
+	"septembre",
+	"octobre",
+	"novembre",
+	"décembre"
+};
 
-static size_t append_string(char* buffer, const size_t length, const char* str) {
+static const char * const ITOA[] =
+{
+	"",
+	"1er",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
+	"9",
+	"10",
+	"11",
+	"12",
+	"13",
+	"14",
+	"15",
+	"16",
+	"17",
+	"18",
+	"19",
+	"20",
+	"21",
+	"22",
+	"23",
+	"24",
+	"25",
+	"26",
+	"27",
+	"28",
+	"29",
+	"30",
+	"31"
+};
+
+static const char * STR_H_HEURES = " heures";
+static const char * STR_H_HEURE = " heure";
+
+static const char * STR_H_0 = " pile";
+static const char * STR_H_1 = " juste passé";
+static const char * STR_H_5 = " cinq";
+static const char * STR_H_10 = " dix";
+static const char * STR_H_15 = " et quart";
+static const char * STR_H_20 = " vingt";
+static const char * STR_H_30 = " et demi";
+static const char * STR_H_40 = " moins vingt";
+static const char * STR_H_45 = " moins le quart";
+static const char * STR_H_50 = " moins dix";
+static const char * STR_H_55 = " moins cinq";
+static const char * STR_H_59 = " moins cinq";
+
+/*
+ *
+ */
+static size_t append_string(char* buffer, const size_t length, const char* str)
+{
 	strncat(buffer, str, length);
 
 	size_t written = strlen(str);
 	return (length > written) ? written : length;
 }
 
-void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
+/*
+ *
+ */
+void fuzzy_date_to_words(int wday, int mday, int mon, char * words, size_t length)
+{
+	size_t remaining = length;
+
+	memset(words, 0, length);
+
+	remaining -= append_string(words, remaining, JOURS[wday]);
+	remaining -= append_string(words, remaining, " ");
+	remaining -= append_string(words, remaining, ITOA[mday]);
+	remaining -= append_string(words, remaining, " ");
+	remaining -= append_string(words, remaining, MOIS[mon]);
+}
+
+/*
+ *
+ */
+void fuzzy_time_to_words(int hours, int minutes, char * words, size_t length)
 {
 	int fuzzy_hours = hours;
 	size_t remaining = length;
@@ -63,33 +150,30 @@ void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
 	}
 
 	/* Hours in words */
-	remaining -= append_string(words, remaining, HOURS[hours<=12?hours:hours-12]);
+	remaining -= append_string(words, remaining, HEURES[fuzzy_hours]);
 	
-	remaining -= append_string(words, remaining, " ");
-
 	if (fuzzy_hours != 12 && fuzzy_hours != 0)
 	{
-		remaining -= append_string(words, remaining, fuzzy_hours==1?STR_HEURE:STR_HEURES);
-		remaining -= append_string(words, remaining, " ");
+		remaining -= append_string(words, remaining, fuzzy_hours==1?STR_H_HEURE:STR_H_HEURES);
 	}
 
 	/* Minutes in words. Enumeration is faster, yay ! */
 	switch(minutes)
 	{
 		case 0:
-			remaining -= append_string(words, remaining, STR_0);
+			remaining -= append_string(words, remaining, STR_H_0);
 			break;
 		
 		case 1:
 		case 2:
-			remaining -= append_string(words, remaining, STR_1);
+			remaining -= append_string(words, remaining, STR_H_1);
 			break;
 			
 		case 3:
 		case 4:
 		case 5:
 		case 6:
-			remaining -= append_string(words, remaining, STR_5);
+			remaining -= append_string(words, remaining, STR_H_5);
 			break;
 			
 		case 7:
@@ -97,7 +181,7 @@ void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
 		case 9:
 		case 10:
 		case 11:
-			remaining -= append_string(words, remaining, STR_10);
+			remaining -= append_string(words, remaining, STR_H_10);
 			break;
 			
 		case 12:
@@ -106,7 +190,7 @@ void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
 		case 15:
 		case 16:
 		case 17:
-			remaining -= append_string(words, remaining, STR_15);
+			remaining -= append_string(words, remaining, STR_H_15);
 			break;
 
 		case 18:
@@ -115,7 +199,7 @@ void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
 		case 21:
 		case 22:
 		case 23:
-			remaining -= append_string(words, remaining, STR_20);
+			remaining -= append_string(words, remaining, STR_H_20);
 			break;
 
 		case 24:
@@ -129,7 +213,7 @@ void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
 		case 32:
 		case 33:
 		case 34:
-			remaining -= append_string(words, remaining, STR_30);
+			remaining -= append_string(words, remaining, STR_H_30);
 			break;
 
 		case 35:
@@ -139,7 +223,7 @@ void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
 		case 39:
 		case 40:
 		case 41:
-			remaining -= append_string(words, remaining, STR_40);
+			remaining -= append_string(words, remaining, STR_H_40);
 			break;
 
 		case 42:
@@ -148,7 +232,7 @@ void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
 		case 45:
 		case 46:
 		case 47:
-			remaining -= append_string(words, remaining, STR_45);
+			remaining -= append_string(words, remaining, STR_H_45);
 			break;
 			
 		case 48:
@@ -156,20 +240,20 @@ void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
 		case 50:
 		case 51:
 		case 52:
-			remaining -= append_string(words, remaining, STR_50);
+			remaining -= append_string(words, remaining, STR_H_50);
 			break;
 
 		case 53:
 		case 54:
 		case 55:
 		case 56:
-			remaining -= append_string(words, remaining, STR_55);
+			remaining -= append_string(words, remaining, STR_H_55);
 			break;
 
 		case 57:
 		case 58:
 		case 59:
-			remaining -= append_string(words, remaining, STR_59);
+			remaining -= append_string(words, remaining, STR_H_59);
 			break;
 	}
 }
