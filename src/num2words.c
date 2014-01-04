@@ -1,146 +1,171 @@
 #include "num2words.h"
 #include "string.h"
 
-static const char* const ONES[] = {
-  "zero",
-  "one",
-  "two",
-  "three",
-  "four",
-  "five",
-  "six",
-  "seven",
-  "eight",
-  "nine"
+static const char* const HOURS[] = {
+	"minuit",
+	"une",
+	"deux",
+	"trois",
+	"quatre",
+	"cinq",
+	"six",
+	"sept",
+	"huit",
+	"neuf",
+	"dix",
+	"onze",
+	"midi"
 };
 
-static const char* const TEENS[] ={
-  "",
-  "eleven",
-  "twelve",
-  "thirteen",
-  "fourteen",
-  "fifteen",
-  "sixteen",
-  "seventeen",
-  "eighteen",
-  "nineteen"
-};
+static const char * STR_HEURES = "heures";
+static const char * STR_HEURE = "heure";
 
-static const char* const TENS[] = {
-  "",
-  "ten",
-  "twenty",
-  "thirty",
-  "forty",
-  "fifty",
-  "sixty",
-  "seventy",
-  "eighty",
-  "ninety"
-};
-
-static const char* STR_OH_CLOCK = "o'clock";
-static const char* STR_NOON = "noon";
-static const char* STR_MIDNIGHT = "midnight";
-static const char* STR_QUARTER = "quarter";
-static const char* STR_TO = "to";
-static const char* STR_PAST = "past";
-static const char* STR_HALF = "half";
-static const char* STR_AFTER = "after";
-
-static size_t append_number(char* words, int num) {
-  int tens_val = num / 10 % 10;
-  int ones_val = num % 10;
-
-  size_t len = 0;
-
-  if (tens_val > 0) {
-    if (tens_val == 1 && num != 10) {
-      strcat(words, TEENS[ones_val]);
-      return strlen(TEENS[ones_val]);
-    }
-    strcat(words, TENS[tens_val]);
-    len += strlen(TENS[tens_val]);
-    if (ones_val > 0) {
-      strcat(words, " ");
-      len += 1;
-    }
-  }
-
-  if (ones_val > 0 || num == 0) {
-    strcat(words, ONES[ones_val]);
-    len += strlen(ONES[ones_val]);
-  }
-  return len;
-}
+static const char * STR_0 = "pile";
+static const char * STR_5 = "cinq";
+static const char * STR_10 = "dix";
+static const char * STR_15 = "et quart";
+static const char * STR_20 = "vingt";
+static const char * STR_30 = "et demi";
+static const char * STR_40 = "moins vingt";
+static const char * STR_45 = "moins le quart";
+static const char * STR_50 = "moins dix";
+static const char * STR_55 = "moins cinq";
 
 static size_t append_string(char* buffer, const size_t length, const char* str) {
-  strncat(buffer, str, length);
+	strncat(buffer, str, length);
 
-  size_t written = strlen(str);
-  return (length > written) ? written : length;
+	size_t written = strlen(str);
+	return (length > written) ? written : length;
 }
 
-void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length) {
-  int fuzzy_hours = hours;
-  int fuzzy_minutes = ((minutes + 2) / 5) * 5;
+void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
+{
+	int fuzzy_hours = hours;
+	size_t remaining = length;
 
-  // Handle hour & minute roll-over.
-  if (fuzzy_minutes > 55) {
-    fuzzy_minutes = 0;
-    fuzzy_hours += 1;
-    if (fuzzy_hours > 23) {
-      fuzzy_hours = 0;
-    }
-  }
+	memset(words, 0, length);
 
-  size_t remaining = length;
-  memset(words, 0, length);
+	/* Adjust hours */
+	if (fuzzy_hours > 12)
+	{
+		fuzzy_hours = fuzzy_hours -12;
+	}
 
-  if (fuzzy_minutes != 0 && (fuzzy_minutes >= 10 || fuzzy_minutes == 5 || fuzzy_hours == 0 || fuzzy_hours == 12)) {
-    if (fuzzy_minutes == 15) {
-      remaining -= append_string(words, remaining, STR_QUARTER);
-      remaining -= append_string(words, remaining, " ");
-      remaining -= append_string(words, remaining, STR_AFTER);
-      remaining -= append_string(words, remaining, " ");
-    } else if (fuzzy_minutes == 45) {
-      remaining -= append_string(words, remaining, STR_QUARTER);
-      remaining -= append_string(words, remaining, " ");
-      remaining -= append_string(words, remaining, STR_TO);
-      remaining -= append_string(words, remaining, " ");
+	if (minutes > 34) /* Why 34 ? See the switch/case later */
+	{
+		fuzzy_hours += 1;
+		if (fuzzy_hours == 13)
+		{
+			fuzzy_hours = 0;
+		}
+	}
 
-      fuzzy_hours = (fuzzy_hours + 1) % 24;
-    } else if (fuzzy_minutes == 30) {
-      remaining -= append_string(words, remaining, STR_HALF);
-      remaining -= append_string(words, remaining, " ");
-      remaining -= append_string(words, remaining, STR_PAST);
-      remaining -= append_string(words, remaining, " ");
-    } else if (fuzzy_minutes < 30) {
-      remaining -= append_number(words, fuzzy_minutes);
-      remaining -= append_string(words, remaining, " ");
-      remaining -= append_string(words, remaining, STR_AFTER);
-      remaining -= append_string(words, remaining, " ");
-    } else {
-      remaining -= append_number(words, 60 - fuzzy_minutes);
-      remaining -= append_string(words, remaining, " ");
-      remaining -= append_string(words, remaining, STR_TO);
-      remaining -= append_string(words, remaining, " ");
+	/* Hours in words */
+	remaining -= append_string(words, remaining, HOURS[hours<=12?hours:hours-12]);
+	
+	remaining -= append_string(words, remaining, " ");
 
-      fuzzy_hours = (fuzzy_hours + 1) % 24;
-    }
-  }
+	if (fuzzy_hours != 12 && fuzzy_hours != 0)
+	{
+		remaining -= append_string(words, remaining, fuzzy_hours==1?STR_HEURE:STR_HEURES);
+		remaining -= append_string(words, remaining, " ");
+	}
 
-  if (fuzzy_hours == 0) {
-    remaining -= append_string(words, remaining, STR_MIDNIGHT);
-  } else if (fuzzy_hours == 12) {
-    remaining -= append_string(words, remaining, STR_NOON);
-  } else {
-    remaining -= append_number(words, fuzzy_hours % 12);
-  }
+	/* Minutes in words. Enumeration is faster, yay ! */
+	switch(minutes)
+	{
+		case 0:
+			remaining -= append_string(words, remaining, STR_0);
+			break;
+		
+		case 1:
+		case 2:
+			break;
+			
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+			remaining -= append_string(words, remaining, STR_5);
+			break;
+			
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+		case 11:
+			remaining -= append_string(words, remaining, STR_10);
+			break;
+			
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+		case 16:
+		case 17:
+			remaining -= append_string(words, remaining, STR_15);
+			break;
 
-  if (fuzzy_minutes == 0 && !(fuzzy_hours == 0 || fuzzy_hours == 12)) {
-    remaining -= append_string(words, remaining, " ");
-    remaining -= append_string(words, remaining, STR_OH_CLOCK);
-  }
+		case 18:
+		case 19:
+		case 20:
+		case 21:
+		case 22:
+		case 23:
+			remaining -= append_string(words, remaining, STR_20);
+			break;
+
+		case 24:
+		case 25:
+		case 26:
+		case 27:
+		case 28:
+		case 29:
+		case 30:
+		case 31:
+		case 32:
+		case 33:
+		case 34:
+			remaining -= append_string(words, remaining, STR_30);
+			break;
+
+		case 35:
+		case 36:
+		case 37:
+		case 38:
+		case 39:
+		case 40:
+		case 41:
+			remaining -= append_string(words, remaining, STR_40);
+			break;
+
+		case 42:
+		case 43:
+		case 44:
+		case 45:
+		case 46:
+		case 47:
+			remaining -= append_string(words, remaining, STR_45);
+			break;
+			
+		case 48:
+		case 49:
+		case 50:
+		case 51:
+		case 52:
+			remaining -= append_string(words, remaining, STR_50);
+			break;
+
+		case 53:
+		case 54:
+		case 55:
+		case 56:
+			remaining -= append_string(words, remaining, STR_55);
+			break;
+
+		case 57:
+		case 58:
+		case 59:
+			break;
+	}
 }
