@@ -35,7 +35,8 @@ static void do_init(void) {
 
 	window_set_background_color(s_data.window, GColorBlack);
 	//GFont time_font = fonts_get_system_font(FONT_KEY_DROID_SERIF_28_BOLD);
-	GFont time_font = fonts_get_system_font(FONT_KEY_BITHAM_30_BLACK);
+	//GFont time_font = fonts_get_system_font(FONT_KEY_BITHAM_30_BLACK);
+	GFont time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_GOTHAM_CITY_30));
 	GFont date_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
 
 	Layer *root_layer = window_get_root_layer(s_data.window);

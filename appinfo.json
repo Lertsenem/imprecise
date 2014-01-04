@@ -16,6 +16,11 @@
         "type": "png",
         "name": "IMAGE_MENU_ICON",
         "file": "images/menu_icon_fuzzy_watch.png"
+      },
+      {
+	"type": "font",
+	"name": "FONT_GOTHAM_CITY_30",
+	"file": "fonts/gotham-city/GothamCity_30.ttf"
       }
     ]
   }
