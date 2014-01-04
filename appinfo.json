@@ -1,12 +1,12 @@
 {
   "uuid": "2b12fa00-758b-466f-80bf-55fad9cbaa3d",
-  "shortName": "imprecise",
+  "shortName": "Imprecise",
   "longName": "Imprecise",
   "companyName": "Lertsenem",
   "versionCode": 1,
   "versionLabel": "1.0.0",
   "watchapp": {
-    "watchface": false
+    "watchface": true
   },
   "appKeys": {},
   "resources": {
