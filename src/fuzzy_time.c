@@ -24,12 +24,8 @@ static void update_time(struct tm* t) {
 
 static void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed)
 {
-	update_time(tick_time);
-}
-
-static void handle_hour_tick(struct tm *tick_time, TimeUnits units_changed)
-{
 	update_date(tick_time);
+	update_time(tick_time);
 }
 
 static void do_init(void) {
@@ -39,8 +35,8 @@ static void do_init(void) {
 
 	window_set_background_color(s_data.window, GColorBlack);
 	//GFont time_font = fonts_get_system_font(FONT_KEY_DROID_SERIF_28_BOLD);
-	GFont time_font = fonts_get_system_font(FONT_KEY_BITHAM_34_MEDIUM_NUMBERS);
-	GFont date_font = fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD);
+	GFont time_font = fonts_get_system_font(FONT_KEY_BITHAM_30_BLACK);
+	GFont date_font = fonts_get_system_font(FONT_KEY_GOTHIC_14);
 
 	Layer *root_layer = window_get_root_layer(s_data.window);
 	GRect frame = layer_get_frame(root_layer);
@@ -67,7 +63,6 @@ static void do_init(void) {
 	update_date(t);
 
 	tick_timer_service_subscribe(MINUTE_UNIT, &handle_minute_tick);
-	tick_timer_service_subscribe(HOUR_UNIT, &handle_hour_tick);
 }
 
 static void do_deinit(void) {
