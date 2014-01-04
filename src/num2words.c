@@ -3,19 +3,19 @@
 
 static const char * const HEURES[] =
 {
-	"minuit",
-	"une",
-	"deux",
-	"trois",
-	"quatre",
-	"cinq",
-	"six",
-	"sept",
-	"huit",
-	"neuf",
-	"dix",
-	"onze",
-	"midi"
+	"MINUIT",
+	"UNE",
+	"DEUX",
+	"TROIS",
+	"QUATRE",
+	"CINQ",
+	"SIX",
+	"SEPT",
+	"HUIT",
+	"NEUF",
+	"DIX",
+	"ONZE",
+	"MIDI"
 };
 
 static const char * const JOURS[] =
@@ -84,18 +84,18 @@ static const char * const ITOA[] =
 static const char * STR_H_HEURES = " heures";
 static const char * STR_H_HEURE = " heure";
 
-static const char * STR_H_0 = " pile";
+static const char * STR_H_0 = " PILE";
 static const char * STR_H_1 = " juste passé";
-static const char * STR_H_5 = " cinq";
-static const char * STR_H_10 = " dix";
-static const char * STR_H_15 = " et quart";
-static const char * STR_H_20 = " vingt";
-static const char * STR_H_30 = " et demi";
-static const char * STR_H_40 = " moins vingt";
-static const char * STR_H_45 = " moins le quart";
-static const char * STR_H_50 = " moins dix";
-static const char * STR_H_55 = " moins cinq";
-static const char * STR_H_59 = " moins cinq";
+static const char * STR_H_5 = " CINQ";
+static const char * STR_H_10 = " DIX";
+static const char * STR_H_15 = " et QUART";
+static const char * STR_H_20 = " VINGT";
+static const char * STR_H_30 = " et DEMI";
+static const char * STR_H_40 = " MOINS VINGT";
+static const char * STR_H_45 = " MOINS le QUART";
+static const char * STR_H_50 = " MOINS DIX";
+static const char * STR_H_55 = " MOINS CINQ";
+static const char * STR_H_59 = " ou presque";
 
 /*
  *
@@ -135,18 +135,18 @@ void fuzzy_time_to_words(int hours, int minutes, char * words, size_t length)
 	memset(words, 0, length);
 
 	/* Adjust hours */
-	if (fuzzy_hours > 12)
-	{
-		fuzzy_hours = fuzzy_hours -12;
-	}
-
 	if (minutes > 34) /* Why 34 ? See the switch/case later */
 	{
 		fuzzy_hours += 1;
-		if (fuzzy_hours == 13)
+		if (fuzzy_hours == 24)
 		{
 			fuzzy_hours = 0;
 		}
+	}
+
+	if (fuzzy_hours > 12)
+	{
+		fuzzy_hours = fuzzy_hours -12;
 	}
 
 	/* Hours in words */
