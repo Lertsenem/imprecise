@@ -21,6 +21,7 @@ static const char * STR_HEURES = "heures";
 static const char * STR_HEURE = "heure";
 
 static const char * STR_0 = "pile";
+static const char * STR_1 = "juste passé";
 static const char * STR_5 = "cinq";
 static const char * STR_10 = "dix";
 static const char * STR_15 = "et quart";
@@ -30,6 +31,7 @@ static const char * STR_40 = "moins vingt";
 static const char * STR_45 = "moins le quart";
 static const char * STR_50 = "moins dix";
 static const char * STR_55 = "moins cinq";
+static const char * STR_59 = "moins cinq";
 
 static size_t append_string(char* buffer, const size_t length, const char* str) {
 	strncat(buffer, str, length);
@@ -80,6 +82,7 @@ void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
 		
 		case 1:
 		case 2:
+			remaining -= append_string(words, remaining, STR_1);
 			break;
 			
 		case 3:
@@ -166,6 +169,7 @@ void fuzzy_time_to_words(int hours, int minutes, char* words, size_t length)
 		case 57:
 		case 58:
 		case 59:
+			remaining -= append_string(words, remaining, STR_59);
 			break;
 	}
 }
