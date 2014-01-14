@@ -14,7 +14,6 @@ static struct CommonWordsData
 	TextLayer * time;
 	Layer * battery;
 	Layer * bluetooth;
-	Layer * static_ui;
 	Window * window;
 	char date_buffer[BUFFER_SIZE];
 	char time_buffer[BUFFER_SIZE];
@@ -36,20 +35,6 @@ static void update_time(struct tm* t) {
 	text_layer_set_text(s_data.time, s_data.time_buffer);
 }
 
-/*
- * Hopefully, called once only, at start.
- */
-static void static_ui_update_callback(Layer * me, GContext * ctx)
-{
-	/* set bg color to black */
-	graphics_context_set_fill_color(ctx, GColorBlack);
-
-	/* battery extremities markers */
-	graphics_context_set_stroke_color(ctx, GColorWhite);
-	graphics_draw_line(ctx, GPoint(UI_BATTERY_LINE_X -1, 1), GPoint(UI_BATTERY_LINE_X -1, 2));
-	graphics_draw_line(ctx, GPoint(UI_BATTERY_LINE_X +101, 1), GPoint(UI_BATTERY_LINE_X +101, 2));
-}
-
 static void battery_update_callback(Layer * me, GContext * ctx)
 {
 	/* set bg color to black */
@@ -58,17 +43,24 @@ static void battery_update_callback(Layer * me, GContext * ctx)
 	/* get battery */
 	BatteryChargeState battery = battery_state_service_peek();
 
+	/* transorm battery as coordinates */
+	int shift = (100 - battery.charge_percent) /2;
+
 	/* draw battery as a line, add dots if charging */
 	graphics_context_set_stroke_color(ctx, GColorWhite);
-	graphics_draw_line(ctx, GPoint(0, 0), GPoint(battery.charge_percent, 0));
-	graphics_draw_pixel(ctx, GPoint(50, 0)); /* mark the middle */
+	graphics_draw_line(ctx, GPoint(shift, 0), GPoint(100-shift, 0));
 	
 	if (battery.is_charging && battery.charge_percent < 100)
 	{
 		graphics_context_set_stroke_color(ctx, GColorBlack);
-		graphics_draw_pixel(ctx, GPoint(battery.charge_percent -1, 0));
-		graphics_draw_pixel(ctx, GPoint(battery.charge_percent -3, 0));
-		graphics_draw_pixel(ctx, GPoint(battery.charge_percent -5, 0));
+
+		graphics_draw_pixel(ctx, GPoint(shift +1, 0));
+		graphics_draw_pixel(ctx, GPoint(shift +3, 0));
+		graphics_draw_pixel(ctx, GPoint(shift +5, 0));
+
+		graphics_draw_pixel(ctx, GPoint(100-shift -1, 0));
+		graphics_draw_pixel(ctx, GPoint(100-shift -3, 0));
+		graphics_draw_pixel(ctx, GPoint(100-shift -5, 0));
 	}
 }
 
@@ -147,22 +139,16 @@ static void do_init(void) {
 	text_layer_set_text_alignment(s_data.date, GTextAlignmentCenter);
 	layer_add_child(root_layer, text_layer_get_layer(s_data.date));
 
-	/* static_ui layer (the statics elements of the ui) */
-	s_data.static_ui = layer_create(GRect(0,frame.size.h-5,frame.size.w,frame.size.h));
-	layer_set_update_proc(s_data.static_ui, static_ui_update_callback);
-	layer_add_child(root_layer, s_data.static_ui);
-	layer_mark_dirty(s_data.static_ui);
-
 	/* battery layer */
-	s_data.battery = layer_create(GRect(UI_BATTERY_LINE_X,2,UI_BATTERY_LINE_X+100,2));
+	s_data.battery = layer_create(GRect(UI_BATTERY_LINE_X,frame.size.h-3,UI_BATTERY_LINE_X+100,frame.size.h-3));
 	layer_set_update_proc(s_data.battery, battery_update_callback);
-	layer_add_child(s_data.static_ui, s_data.battery);
+	layer_add_child(root_layer, s_data.battery);
 	layer_mark_dirty(s_data.battery);
 
 	/* bluetooth layer */
-	s_data.bluetooth = layer_create(GRect(UI_BLUETOOTH_X,0,UI_BLUETOOTH_X+2,4));
+	s_data.bluetooth = layer_create(GRect(UI_BLUETOOTH_X,frame.size.h-5,UI_BLUETOOTH_X+2,frame.size.h-1));
 	layer_set_update_proc(s_data.bluetooth, bluetooth_update_callback);
-	layer_add_child(s_data.static_ui, s_data.bluetooth);
+	layer_add_child(root_layer, s_data.bluetooth);
 	layer_mark_dirty(s_data.bluetooth);
 
 	/* first run */
@@ -184,7 +170,6 @@ static void do_deinit(void) {
 	text_layer_destroy(s_data.date);
 	layer_destroy(s_data.battery);
 	layer_destroy(s_data.bluetooth);
-	layer_destroy(s_data.static_ui);
 }
 
 int main(void) {
